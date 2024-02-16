@@ -1,0 +1,123 @@
+﻿@model Employee
+@inject IUnitOfWork Uof
+@{   
+    IEnumerable<Employee> Employees =await Uof.EmployeeRepository.GetAll(x => true);
+    ViewData["Title"] = Resource.lbl_Employees;
+}
+
+@if (TempData["Employeemsg"] != null)
+{
+    <input id="msgOperationSucced" value="@TempData["Employeemsg"]" hidden />
+
+}
+else
+{
+    <input id="msgOperationSucced" value="" hidden />
+}
+
+
+
+<section class="employee-header">
+    
+    <form method="post" enctype="multipart/form-data">
+        @Html.Partial("ConfirmDeleteView")
+        @Html.Partial("MainControlsView")
+    
+       
+
+        <div id="EmpHeader">
+            @Html.Partial("EmployeeHeader", Model)
+        </div>
+    </form>
+   </section>
+                       <section class="mt-5">
+                          @if (Employees.Count() == 0)
+                            {
+                                <div class="alert alert-warning">@Resource.lbl_NoData</div>
+                            }else{
+
+        <table class="table table-striped Branches-tbl" id="tbl-employees">
+                              <thead>
+                                  <tr>
+                                      <th>@Resource.lbl_Name</th>
+                                      <th>@Resource.lbl_Address</th>
+                                      <th>@Resource.lbl_Department</th>
+                                      <th></th>
+                                  </tr>
+                              </thead>
+                              <tbody style="height:400px">
+                                @foreach (var emp in Employees)
+                                {
+                                     <tr>
+                                         <td hidden>@emp.KeyID</td>
+                                         <td>@emp.Name</td>
+                                         <td>@emp.Address</td>
+                                         <td>@emp.Department.Name</td>
+                        <td><a style="cursor:pointer;" class="btn-edit-row">@Resource.btn_Edit</a></td>
+                                     </tr>
+                                    }
+                              </tbody>
+
+                          </table>
+}
+                    </section>
+
+@section EmployeeScript {
+<script>      
+    
+    $(function () {                            
+            let KeyModelId = document.getElementById('IsNullOrNot').value;
+            if (KeyModelId == "0") {
+                $('.btn-save').removeAttr('disabled');
+                $('.btn-edit').attr('disabled', 'disabled');
+                $('.btn-delete').attr('disabled', 'disabled');
+            }
+            else {
+                $('.btn-save').attr('disabled', 'disabled');
+                $('.btn-edit').removeAttr('disabled');
+                $('.btn-delete').removeAttr('disabled');
+            }
+
+        $('.btnserach').css('display', 'none');        
+    });
+
+
+    function ShowImage(ctrl)
+    {
+            const file = ctrl.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {                            
+                            $('#EmployeeImage').removeAttr('src');
+                            $('#EmployeeImage').attr('src', event.target.result);
+                            $("#ImageName").val(file.name);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        $('#EmployeeImage').attr('src', '#');
+                        $("#ImageName").val('');
+
+                    }
+    }
+    
+        $('.btn-edit-row').click(function () {
+            var empId= this.closest('tr').cells[0].innerHTML;
+            $.ajax({
+                data: {id:empId},
+                url: "/Employee/Index?id="+empId ,
+                type: 'GET',
+                success: function (result) {
+                    $("#EmpHeader").empty();
+                    $("#EmpHeader").append($(result).find("#EmpHeader").html());
+                    $('.btn-save').attr('disabled', 'disabled');
+                    $('.btn-edit').removeAttr('disabled');
+                    $('.btn-delete').removeAttr('disabled');
+                    $('select').select2();
+                }
+        });
+   });
+
+
+</script>
+}
+

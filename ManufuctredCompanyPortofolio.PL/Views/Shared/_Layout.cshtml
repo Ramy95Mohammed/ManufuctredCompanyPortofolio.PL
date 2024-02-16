@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="en" id="master-html">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/select2/css/select2.min.css" rel="stylesheet" />
+    <!--<link href="~/lib/selectize/selectize.default.min.css" rel="stylesheet" />-->
+    <!--<link href="~/lib/choosen/chosen.min.css" rel="stylesheet" />-->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ManufuctredCompanyPortofolio.PL.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div>
+        <header class="fixed-top">
+            <nav class="navbar navbar-expand-lg bg-dark bg-opacity-25">
+                <div class="container-fluid ">
+                    <!-- <a class="navbar-brand" href="#">@Resource.lbl_portfolioProject</a>-->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" asp-controller="ManufctredCompany" asp-action="Index">@Resource.lbl_ManufctresCompanies</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" asp-controller="ManfCompanyBranchResPerson" asp-action="Index">@Resource.lbl_ManufctresCompaniesBranchesResponsiblePerson</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" asp-controller="Employee" asp-action="Index" asp-route-id="" >@Resource.lbl_Employees</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" asp-controller="Account" asp-action="SiginOut" asp-route-id="">@Resource.lbl_SignOut</a>
+                            </li>
+                           
+                        </ul>
+                        <form class="d-flex" role="search">
+                            <input class="form-control me-2" type="search" placeholder="@Resource.lbl_Search" aria-label="Search">
+                            <button class="btn btn-outline-success mx-2" type="submit">@Resource.lbl_Search</button>
+                        </form>
+                        <div class="langBtns">
+                            <a class="btn btn-outline-dark bg-transparent" asp-controller="ManufctredCompany" asp-action="SetLanguage" asp-route-lang="ar-EG">Ar</a>
+                            <a class="btn btn-outline-dark bg-transparent" asp-controller="ManufctredCompany" asp-action="SetLanguage" asp-route-lang="en-US">En</a>                            
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        <div class="alert-success text-center" >Master And Details Screen</div>
+        </header>
+        <div style="margin-bottom:90px;">
+            
+        </div>
+        <div class="modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Resource.lbl_Warining</h5>
+                        <button type="button" class="btn-close" onclick="hideModal();" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary invisible"  data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn btn-primary " onclick="hideModal();">@Resource.lbl_OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @{
+            if (ProgramLanguage.Language == ProgramLanguage.Arabic)
+            {
+                <input hidden value="rtl" id="lng" />
+            }
+            else
+            {
+                <input hidden value="ltr" id="lng" />
+            }
+        }
+        
+
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - ManufuctredCompanyPortofolio.PL - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        var el = document.getElementById('master-html')
+        if (document.getElementById('lng').value == 'rtl') {
+            el.setAttribute('dir', 'rtl');
+        }
+        else {
+            el.setAttribute('dir', 'ltr');
+        }
+        function hideModal()
+        {
+            document.querySelector('.modal').style.display = 'none';
+        }
+    </script>
+
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    
+    
+    
+    <script src="~/popper.js/umd/popper.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" ></script>
+
+   <!-- <script src="~/lib/selectize/selectize.min.js"></script>-->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script src="~/select2/js/select2.min.js"></script>
+    
+    <!--<script src="~/lib/choosen/chosen.jquery.min.js"></script>-->
+    
+    @await RenderSectionAsync("Companyscript", required: false)
+    @await RenderSectionAsync("RespnsiblePeopleScript", required: false)
+    @await RenderSectionAsync("txt_Search", required: false)
+    @await RenderSectionAsync("EmployeeScript", required: false)
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
+    

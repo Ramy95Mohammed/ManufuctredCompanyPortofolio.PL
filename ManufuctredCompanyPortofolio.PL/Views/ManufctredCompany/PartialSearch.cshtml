@@ -1,0 +1,59 @@
+﻿@model IEnumerable<ManufcturingCompany>
+@inject IWebHostEnvironment hostingEnvironment
+
+@{
+   var countries= ExtCls.GetCountries(hostingEnvironment);
+}
+@if (Model.Count() == 0)
+{
+    <div class="alert alert-warning text-center fs-6 fw-bolder">@Resource.lbl_NoData</div>
+    <a class="btn btn-info" asp-action="Index">@Resource.lbl_backForward</a>
+}
+else
+{
+    <div class="w-100 py-2 d-flex justify-content-center alert-success ">
+        <label for="txt-Search" class="fs-5 px-3">@Resource.lbl_Search:</label>
+        <input id="txt-Search" class="form-control w-50" />
+    </div>
+
+    <table class="table table-striped table-hover" id="tbl_Search">
+        <thead>
+            <tr>
+                <th>@Resource.lblComanyName</th>
+                <th>@Resource.lbl_IsActive</th>
+                <th>@Resource.lbl_Country</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var company in Model)
+            {
+                <tr>
+
+                    <td>
+                        @{
+                            var strCopmanyName = (ProgramLanguage.Language == ProgramLanguage.Arabic) ? company.ArName : company.EnName;
+                        }
+                        @strCopmanyName
+                    </td>
+                    <td><input type="checkbox" asp-for="@company.IsActive" readonly /></td>
+                    <td>
+                        @{
+                            var country = countries.FirstOrDefault(x => x.NationalityID == company.CountryId);
+                        }@{
+                            string strcountry = "";
+                            if(country != null)
+                            strcountry = (ProgramLanguage.Language == ProgramLanguage.Arabic) ? country.CountryAr : country.CountryEn;
+
+                        }
+                        @strcountry
+                    </td>
+                    <td><a asp-action="Index" asp-route-id="@company.KeyID">@Resource.btn_Edit</a></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+

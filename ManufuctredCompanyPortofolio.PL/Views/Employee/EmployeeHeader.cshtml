@@ -1,0 +1,78 @@
+﻿@model Employee
+@inject IUnitOfWork Uof
+@{
+    SelectList Departments;
+
+    List<Department> GetDepartments = (List<Department>)await Uof.DepartmentRepository.GetAll(x => true);
+    Departments = new SelectList(GetDepartments, nameof(Department.KeyID), nameof(Department.Name));
+}
+
+@if (Model != null && Model.KeyID == 0)
+{
+    <input id="IsNullOrNot" asp-for="@Model.KeyID" hidden />
+}
+else
+{
+    <input id="IsNullOrNot" value="" hidden />
+}
+
+<input hidden asp-for="KeyID" />
+
+<div class="row">
+    
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label">@Resource.lbl_Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span class="text-danger" asp-validation-for="Name"></span>
+    </div>
+   
+   
+    <div class="col-md-6">
+        <label asp-for="Mobile" class="form-label">@Resource.lbl_Mobile</label>
+        <input asp-for="Mobile" class="form-control" />
+        <span class="text-danger" asp-validation-for="Mobile"></span>
+    </div>
+    <div class="col-md-6 mt-2">
+        <div class="row">
+            <div class="Emp-select-Image col-10">
+                <label asp-for="Image" class="form-label">@Resource.lbl_Image</label>
+                <div class="d-flex">
+                <input asp-for="Image" onchange="ShowImage(this);" class="h-25"  accept="image/*" id="EmplyeeFile" />
+                <input  asp-for="ImageName" class="form-control h-25 invisible" />
+                <span class="text-danger" asp-validation-for="ImageName"></span>
+                </div>
+
+                <div class="Departments">
+                    <label asp-for="DepartmentId" class="form-label">@Resource.lbl_Department</label>
+                    <div class="d-flex">
+                    <select asp-for="DepartmentId" asp-items="Departments" class="form-select">
+                        <option value="">--@Resource.lbl_Choose--</option>
+                    </select>
+                    
+                    </div>
+                    <span class="text-danger" asp-validation-for="DepartmentId"></span>
+                </div>
+            </div>
+            
+            <div class="Emp-Image col-2">
+            @if(Model.ImageName != null)
+            {
+                <img  src="~/Files/Images/@Model.ImageName" class="card img-fluid" id="EmployeeImage" style="width:200px; height:150px" />
+            }
+            else 
+            {
+                <img class="card img-fluid" id="EmployeeImage" style="width:200px; height:150px" />
+            }
+            </div>
+            
+        </div>
+        
+            </div>
+    <div class="col-md-6">
+        <label asp-for="Address" class="form-label">@Resource.lbl_Address</label>
+        <input asp-for="Address" class="form-control" />
+        <span class="text-danger" asp-validation-for="Address"></span>
+       
+    </div>    
+</div>
+

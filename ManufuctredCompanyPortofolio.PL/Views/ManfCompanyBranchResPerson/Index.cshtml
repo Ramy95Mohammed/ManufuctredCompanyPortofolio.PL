@@ -1,0 +1,185 @@
+﻿@model IEnumerable<ManufcturingCompany>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    SelectList companies = new SelectList(Model, nameof(ManufcturingCompany.KeyID), (ProgramLanguage.Language == ProgramLanguage.Arabic) ? nameof(ManufcturingCompany.ArName) : nameof(ManufcturingCompany.EnName));
+    SelectList companyBranches=null;
+    if (ViewData["CompanyBranches"] != null)
+    {
+        companyBranches = new SelectList(ViewData["CompanyBranches"] as IEnumerable<ManuductringCompanyBranch>, nameof(ManuductringCompanyBranch.KeyID), (ProgramLanguage.Language == ProgramLanguage.Arabic) ? nameof(ManuductringCompanyBranch.ArName) : nameof(ManuductringCompanyBranch.EnName));
+    }
+    
+}
+
+<form id="myForm">
+    @Html.Partial("ConfirmDeleteView")
+    @Html.Partial("MainControlsView")
+    
+   <div class="row">
+       <div class="col-md-6">
+            <select asp-items="companies" id="cbx-companies" class="form-select" >
+               <option value="">@Resource.lbl_Choose</option>
+           </select>
+       </div>
+       <div class="col-md-6">
+           <div id="companyBranches">
+            @{
+                    if (ViewData["CompanyBranches"] != null)
+            {
+                                                        <select asp-items="companyBranches" id="cbxcompanyBranch" class="form-select"><option value="">@Resource.lbl_Choose</option></select>
+            }
+            else
+            {
+                                                        <select id="cbxcompanyBranch" class="form-select "><option value="">@Resource.lbl_Choose</option></select>
+            }
+            }
+            </div>
+        </div>
+        <div class="col-md-12">
+            <table id="tblResponsiblePeopleData" class="table table-hover table-striped">
+                <thead>
+                    <tr><th>@Resource.lbl_ArName</th>
+                        <th>@Resource.lbl_EnName</th>
+                        <th>@Resource.lbl_Mobile</th>
+                        <th>@Resource.lbl_Email</th>
+                        <th><button type="button" class="btn btn-primary" onclick="addNewBranch(this)">@Resource.lbl_Add</button></th>
+                        </tr>                    
+                </thead>
+                <tbody>
+                    @{
+                        var companyBranchesResPerson = (ViewData["companyBranchesResPerson"] as IEnumerable<CompanyBranchesResponsiblePerson>).ToList();
+                        for (int x = 0; x < companyBranchesResPerson.Count(); x++)
+                        {
+                                    <tr>
+                                    <td hidden><input asp-for="@companyBranchesResPerson[x].KeyID"></td>
+                                        <td hidden><input asp-for="@companyBranchesResPerson[x].IsCompanyBranchesResponsiblePersonDeleted" /></td>
+                                        <td><input class="form-control" asp-for="@companyBranchesResPerson[x].PersonArName" />
+                                            <span class="text-danger" asp-validation-for="@companyBranchesResPerson[x].PersonArName"></span>
+                                        </td>
+                                        <td><input class="form-control" asp-for="@companyBranchesResPerson[x].PersonEnName" />
+                                            <span class="text-danger" asp-validation-for="@companyBranchesResPerson[x].PersonEnName"></span>
+                                        </td>
+                                        <td><input class="form-control" asp-for="@companyBranchesResPerson[x].Mobile" />
+                                            <span class="text-danger" asp-validation-for="@companyBranchesResPerson[x].Mobile"></span>
+                                        </td>
+                                        <td><input class="form-control" asp-for="@companyBranchesResPerson[x].Email" />
+                                            <span class="text-danger" asp-validation-for="@companyBranchesResPerson[x].Email"></span>
+                                        </td>
+                                    <td><button type="button" onclick="DeleteRow(this)" class="btn btn-primary">@Resource.btn_Delete</button></td>
+                                    </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+   </div>
+</form>
+
+@section RespnsiblePeopleScript
+{
+    <script>
+
+        $(function () {            
+            $("#cbx-companies").change(function () {
+
+                var selectedValue = $("#cbx-companies").val();
+                
+                    $.ajax({
+                        url: '/ManfCompanyBranchResPerson/Index',
+                        type: 'GET',
+                        data: { companyId: selectedValue },
+                        success: function (result) {
+
+                            $("#companyBranches").empty();
+                            $("#companyBranches").append($(result).find("#companyBranches").html());
+                            $('select').select2({
+                                width: "100%"
+                            });
+                        $("#cbxcompanyBranch").change(function () {
+                            var selectedValueBranch = $("#cbxcompanyBranch").val();
+                            $.ajax({
+                                url: '/ManfCompanyBranchResPerson/Index',
+                                type: 'GET',
+                                data: { CompanyBranchId: selectedValueBranch, companyId: selectedValue },
+                                success: function (result) {
+                                    $("#tblResponsiblePeopleData tbody").empty();
+                                    $("#tblResponsiblePeopleData tbody").append($(result).find("#tblResponsiblePeopleData tbody").html());
+                                    $('select').select2({
+                                        width: "100%"
+                                    });
+                                }
+                            });
+
+                        });
+                        }
+                    });
+            }); 
+        });
+
+        
+        function addNewBranch(btn) {
+            var table = document.getElementById('tblResponsiblePeopleData');
+            var rows = table.getElementsByTagName('tr');
+            var rowOuterHtml = rows[rows.length - 1].outerHTML;
+
+            var lastRowIdx = 0;
+            if (rows.length >= 2)
+                lastRowIdx = rows.length - 2;
+            else if (rows.length >= 1)
+                lastRowIdx = rows.length - 1;
+            var nextRowIdx = eval(lastRowIdx) + 1;
+            rowOuterHtml = rowOuterHtml.replaceAll('_' + lastRowIdx + '_', '_' + nextRowIdx + '_');
+            rowOuterHtml = rowOuterHtml.replaceAll('[' + lastRowIdx + ']', '[' + nextRowIdx + ']');
+            rowOuterHtml = rowOuterHtml.replaceAll('-' + lastRowIdx, '-' + nextRowIdx);
+
+            var newRow = table.insertRow();
+            newRow.innerHTML = rowOuterHtml;
+
+            var InputselementsCells = newRow.cells;
+            for (var x = 0; x < InputselementsCells.length; x++) {
+                    if (InputselementsCells[x].querySelector('INPUT') != null)
+                        InputselementsCells[x].querySelector('INPUT').value = '';
+            }
+            rebindValidators();
+        }
+
+        function rebindValidators() {
+            var $form = $('#myForm');
+            $form.unbind();
+            $form.data('validator', null);
+            $.validator.unobtrusive.parse($form);
+            $form.validate($form.data('unobtrusiveValidation').options);
+        }
+
+            function DeleteRow(btn) {
+                var table = document.getElementById('tblResponsiblePeopleData');
+                var rows = table.getElementsByTagName('tr');
+
+                var numberOfShownRows = 0;
+
+                for (var x = 0; x < rows.length; x++) {
+                    var rowStyle = window.getComputedStyle(rows[x]);
+                    if (rowStyle.display !== 'none') {
+                        numberOfShownRows++;
+                    }
+                }
+                if (numberOfShownRows == 2) {
+
+                    document.querySelector('.modal').style.display = 'block';
+                    msgCannotDeleteField();
+                    return;
+                }
+
+                var currentRow = $(btn).closest('tr');
+
+                currentRow[0].cells[1].querySelector('INPUT').checked = 'checked';
+                currentRow[0].cells[1].querySelector('INPUT').value = 'true';
+                currentRow.hide();
+            }
+
+
+        
+
+    </script>
+}

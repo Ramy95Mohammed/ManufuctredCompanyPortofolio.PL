@@ -1,0 +1,34 @@
+﻿@model  IEnumerable<ManufcturingCompany>
+@{
+    ViewData["Title"] = Resource.lbl_Search;
+}
+<h3 class="bg-opacity-10 bg-primary px-2 rounded py-1">@Resource.lbl_Search</h3>
+
+<div id="searchResults">
+    @Html.Partial("PartialSearch", Model)
+</div>
+
+@section txt_Search
+{
+    <script>
+        $(document).ready(function () {
+
+            $('#txt-Search').keyup(function () {
+                
+                var searchTerm = $("#txt-Search").val();
+                $.ajax({
+                    url: '/ManufctredCompany/Search',
+                    type: 'GET',
+                    data: { strSearch: searchTerm },
+                    success: function (result) {
+
+                        $("#tbl_Search tbody").empty();
+                        $("#tbl_Search tbody").append($(result).find("#tbl_Search tbody").html());
+                        $("#tbl_Search").find(':input').prop('disabled', true);
+                    }
+                });
+            });
+            $("#tbl_Search").find(':input').prop('disabled', true);
+        });
+    </script>
+}

@@ -1,0 +1,182 @@
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@inject IWebHostEnvironment hostingEnvironment
+@model ManufcturingCompany
+@{
+    var countriesList = ExtCls.GetCountries(hostingEnvironment);
+    ViewData["Title"] = Resource.lbl_ManufctresCompanies;
+    SelectList Countries;
+    if (ProgramLanguage.Language == ProgramLanguage.Arabic)
+    {
+        Countries = new SelectList(countriesList, "NationalityID", "CountryAr");
+    }
+    else
+        Countries = new SelectList(countriesList, "NationalityID", "CountryEn");
+}
+
+
+@if (Model != null)
+{
+    <input id="IsNullOrNot" asp-for="KeyID"  hidden/>
+}
+else{
+    <input id="IsNullOrNot" value="" hidden />
+}
+
+@if (TempData["msg"] != null)
+{
+    <input id="msgOperationSucced" value="@TempData["msg"]" hidden />
+}
+else
+{
+    <input id="msgOperationSucced" value="" hidden />
+}
+
+<form asp-action="Index" method="post" id="myForm">
+    @Html.Partial("ConfirmDeleteView")
+    @Html.Partial("MainControlsView")
+    
+    <section class="ComapnyMaster">
+        <h3 class="bg-opacity-10 bg-primary px-2 rounded py-1">@Resource.lbl_CompanyData</h3>
+    <div class="row">
+           <input hidden asp-for="KeyID" />
+            <div class="col-md-3">
+                <label asp-for="Code" class="form-label">@Resource.lbl_Code</label>
+                <input asp-for="Code" class="form-control" />
+                <span class="text-danger"  asp-validation-for="Code"></span>
+            </div>
+        <div class="col-md-3">
+            <label asp-for="ArName" class="form-label">@Resource.lbl_ArName</label>
+            <input asp-for="ArName" class="form-control" />
+            <span class="text-danger" asp-validation-for="ArName"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="EnName" class="form-label">@Resource.lbl_EnName</label>
+            <input asp-for="EnName" class="form-control" />
+            <span class="text-danger"  asp-validation-for="EnName"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Details" class="form-label">@Resource.lbl_Details</label>
+            <input asp-for="Details" class="form-control" />
+            <span class="text-danger"  asp-validation-for="Details"></span>
+        </div>
+
+            <div class="col-md-3">
+                <label asp-for="CurrentAddress" class="form-label">@Resource.lbl_CurrentAddress</label>
+                <input asp-for="CurrentAddress" class="form-control" />
+                <span class="text-danger"  asp-validation-for="CurrentAddress"></span>
+            </div>                       
+            
+            <div class="col-md-3">
+                <label asp-for="CountryId" class="form-label">@Resource.lbl_Country</label>
+
+                <select asp-for="CountryId" asp-items="Countries" class="form-select">
+                    <option value="">--@Resource.lbl_Choose--</option>                    
+                </select>
+              
+                <span class="text-danger" asp-validation-for="CountryId"></span>
+                
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="IsActive" class="form-label">@Resource.lbl_IsActive</label>
+                <input asp-for="IsActive"  type="checkbox" class="form-check" />
+            </div>
+       </div>
+    </section>
+
+
+    <div class="CompanyDetails d-flex">
+
+    
+    <section class="CompanyBranches mt-5 w-50 mx-1">
+            <h3 class="bg-opacity-10 bg-primary px-2 rounded py-1">@Resource.lbl_CompanyBranches</h3>
+            
+                <table class="table table-hover table-striped Branches-tbl" id="tbl-comapny-branches">
+                    <thead>
+                 <tr> 
+                   <th>@Resource.lbl_ArName</th><th>@Resource.lbl_EnName</th><th>@Resource.lbl_Mobile</th><th>@Resource.lbl_GroundTel</th>
+                            <th style="width:60px;">@Resource.lbl_IsActive</th>
+                            <th style="width:80px;">
+                            <button class="btn btn-primary currentBranch" onclick="addNewBranch(this);" id="btn-add-branch" type="button">@Resource.lbl_Add</button>
+                        </th>
+                 
+                 </tr>
+              </thead>
+                <tbody>
+             @if(Model != null && Model.ManuductringCompanyBranches.Count > 0)
+             {
+                  @for(int i = 0;i< Model.ManuductringCompanyBranches.Count;i++)
+                {
+                                <tr>  
+                                <td hidden><input class="form-control" asp-for="@Model.ManuductringCompanyBranches[i].KeyID"></td>
+                                    <td hidden><input asp-for="@Model.ManuductringCompanyBranches[i].IsCompanyBranchDeleted" /></td>
+                                    <td><input class="form-control" asp-for="@Model.ManuductringCompanyBranches[i].ArName" /><span class="text-danger" asp-validation-for="@Model.ManuductringCompanyBranches[i].ArName"></span></td>
+                                    <td><input class="form-control" asp-for="@Model.ManuductringCompanyBranches[i].EnName" /><span class="text-danger"  asp-validation-for="@Model.ManuductringCompanyBranches[i].EnName"></span></td>
+                                    <td><input class="form-control" asp-for="@Model.ManuductringCompanyBranches[i].Mobile" /><span class="text-danger"  asp-validation-for="@Model.ManuductringCompanyBranches[i].Mobile"></span></td>
+                                    <td><input class="form-control" asp-for="@Model.ManuductringCompanyBranches[i].GroundTel"><span class="text-danger"  asp-validation-for="@Model.ManuductringCompanyBranches[i].GroundTel"></span></td>
+                                    <td style="width:60px;"><input class="form-check" asp-for="@Model.ManuductringCompanyBranches[i].IsActive" type="checkbox"></td>
+                                    <td style="width:80px;"><button class="btn btn-primary" onclick="DeleteBranch(this);" id="btn-delete-branch-@i" type="button">@Resource.lbl_Delete</button></td>
+
+                                </tr>
+                }                        
+             }
+              </tbody>
+           </table>
+
+                              
+    </section>
+
+        <section class="CompanyCommunacations mt-5 w-50">
+            <h3 class="bg-opacity-10 bg-primary px-2 rounded py-1">@Resource.lbl_CompanyCommunications</h3>
+
+            <table class="table table-hover table-striped tbl-comapny-Phones Branches-tbl" id="tbl-comapny-phones">
+                    <thead >
+                        <tr>
+                            <th>@Resource.lbl_GroundTel</th>
+                            <th>@Resource.lbl_Mobile</th>
+                            <th>@Resource.lbl_Fax</th>
+                            <th>@Resource.lbl_Email</th>
+                            <th style="width:80px;">
+                            <button class="btn btn-primary" id="btn-add-phone" onclick="addNewPhone(this)" type="button">@Resource.lbl_Add</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                    @if (Model != null && Model.ManufcturingCompanyPhones.Count > 0)
+                    {
+                            @for (int i=0;i< Model.ManufcturingCompanyPhones.Count;i++)
+                            {
+                                <tr>
+                                    <td hidden><input asp-for="@Model.ManufcturingCompanyPhones[i].KeyID" /></td>
+                                    <td hidden><input asp-for="@Model.ManufcturingCompanyPhones[i].IsCompanyCommuncationDeleted" /></td>
+                                        <td><input class="form-control" asp-for="@Model.ManufcturingCompanyPhones[i].GroundTel" />
+                                        <span class="text-danger"  asp-validation-for="@Model.ManufcturingCompanyPhones[i].GroundTel"></span>
+                                    </td>
+
+                                    <td>
+                                        <input class="form-control" asp-for="@Model.ManufcturingCompanyPhones[i].Mobile" />
+                                        <span class="text-danger"  asp-validation-for="@Model.ManufcturingCompanyPhones[i].Mobile"></span>
+                                    </td>
+
+                                    <td>
+                                        <input class="form-control" asp-for="@Model.ManufcturingCompanyPhones[i].Fax" />
+                                        <span class="text-danger"  asp-validation-for="@Model.ManufcturingCompanyPhones[i].Fax"></span>
+                                    </td>
+                                    <td>
+                                        <input class="form-control" asp-for="@Model.ManufcturingCompanyPhones[i].Email" />
+                                        <span class="text-danger"  asp-validation-for="@Model.ManufcturingCompanyPhones[i].Email"></span>
+                                    </td>
+                                <td style="width:80px;"><button class="btn btn-primary" id="btn-delete-phone" onclick="DeletePhone(this)" type="button">@Resource.lbl_Delete</button></td>
+                                </tr>
+                            }
+                    }
+                        </tbody>
+                </table>
+    </section>
+    </div>
+   
+</form>
+@section Companyscript
+{   
+   <script src="~/js/companyInfo.js"></script>
+}
